@@ -1,0 +1,23 @@
+{
+  "name": "linkedlist",
+  "version": "1.0.0",
+  "description": "A linked list implementation taking full advantage of available ES6 features",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mjohnsonengr/linkedlist.git"
+  },
+  "author": "mjohnsonengr",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mjohnsonengr/linkedlist/issues"
+  },
+  "homepage": "https://github.com/mjohnsonengr/linkedlist#readme",
+  "devDependencies": {
+    "tslint": "^3.14.0",
+    "typescript": "^1.8.10"
+  }
+}
