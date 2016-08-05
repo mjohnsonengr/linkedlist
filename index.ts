@@ -209,19 +209,19 @@ const createSimpleNode = (i: number) => {
 
 (function() {
     let i = 0;
-    const root = createSimpleNode(0);
-    const node1 = addLast(root, createSimpleNode(1));
-    const node2 = addLast(root, createSimpleNode(2));
-    const node3 = addLast(root, createSimpleNode(3));
-    /*const leaf11 = */addLast(node1, createSimpleNode(11));
-    /*const leaf12 = */addLast(node1, createSimpleNode(12));
-    /*const leaf13 = */addLast(node1, createSimpleNode(13));
-    /*const leaf21 = */addLast(node2, createSimpleNode(21));
-    /*const leaf22 = */addLast(node2, createSimpleNode(22));
-    /*const leaf23 = */addLast(node2, createSimpleNode(23));
-    /*const leaf31 = */addLast(node3, createSimpleNode(31));
-    /*const leaf32 = */addLast(node3, createSimpleNode(32));
-    /*const leaf33 = */addLast(node3, createSimpleNode(33));
+    const root = createSimpleNode(0),
+        node1 = addLast(root, createSimpleNode(1)),
+        node2 = addLast(root, createSimpleNode(2)),
+        node3 = addLast(root, createSimpleNode(3));
+    addLast(node1, createSimpleNode(11));
+    addLast(node1, createSimpleNode(12));
+    addLast(node1, createSimpleNode(13));
+    addLast(node2, createSimpleNode(21));
+    addLast(node2, createSimpleNode(22));
+    addLast(node2, createSimpleNode(23));
+    addLast(node3, createSimpleNode(31));
+    addLast(node3, createSimpleNode(32));
+    addLast(node3, createSimpleNode(33));
     let node: ISimpleNode = root;
     while (node != null) {
         // tslint:disable-next-line
