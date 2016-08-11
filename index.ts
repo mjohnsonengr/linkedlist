@@ -93,9 +93,14 @@ function createLeaf<
 // ==========================================
 
 /** Returns true if root has children */
-function isParent(parentNode: ITreeNodeParentAny) {
-    assert(isValidParent(parentNode), "cannot check if node is parent: node is invalid");
-    return !!parentNode.first;
+function isParent(node: ITreeNodeParentAny) {
+    assert(isValidParent(node), "cannot check if node is parent: node is invalid");
+    return !!node.first;
+}
+
+/** Returns true if root has a parent */
+function isChild(node: ITreeNodeChildAny) {
+    return !!node.parent;
 }
 
 /** Returns true if node does not have a parent. */
@@ -186,8 +191,66 @@ function addLast<
     return node;
 }
 
-// TODO addAfter(existingNode, nodeToAdd)
-// TODO addBefore(existingNode, nodeToAdd)
+function addAfter<
+    TParent extends ITreeNodeParent<ITreeNodeChild<TParent>>,
+    TSibling extends ITreeNodeChildSibling<TParent, TSibling>
+>(existingNode: TSibling, nodeToAdd: TSibling) {
+
+    const parent = existingNode.parent,
+        last = parent.last === existingNode;
+
+    assert(isValidChild(nodeToAdd), "cannot add node because it is invalid");
+    assert(isValidParent(parent), "cannot add to parent because it is invalid");
+    assert(isChild(existingNode), "cannot add node as a sibling to a root");
+    assert(isRoot(nodeToAdd), "expect node to add not currently parented");
+
+    // sibling relationship
+    if (!last) {
+        nodeToAdd.nextSibling = existingNode.nextSibling;
+        nodeToAdd.nextSibling.prevSibling = nodeToAdd;
+    }
+    nodeToAdd.prevSibling = existingNode;
+    existingNode.nextSibling = nodeToAdd;
+
+    // parent-child relationship
+    nodeToAdd.parent = parent;
+    if (last) {
+        parent.last = nodeToAdd;
+    }
+
+    return nodeToAdd;
+}
+
+function addBefore<
+    TParent extends ITreeNodeParent<ITreeNodeChild<TParent>>,
+    TSibling extends ITreeNodeChildSibling<TParent, TSibling>
+>(existingNode: TSibling, nodeToAdd: TSibling) {
+
+    const parent = existingNode.parent,
+        first = parent.first === existingNode;
+
+    assert(isValidChild(nodeToAdd), "cannot add node because it is invalid");
+    assert(isValidParent(parent), "cannot add to parent because it is invalid");
+    assert(isChild(existingNode), "cannot add node as a sibling to a root");
+    assert(isRoot(nodeToAdd), "expect node to add not currently parented");
+
+    // sibling relationship
+    if (!first) {
+        nodeToAdd.prevSibling = existingNode.prevSibling;
+        nodeToAdd.prevSibling.nextSibling = nodeToAdd;
+    }
+    nodeToAdd.nextSibling = existingNode;
+    existingNode.prevSibling = nodeToAdd;
+
+    // parent-child relationship
+    nodeToAdd.parent = parent;
+    if (first) {
+        parent.first = nodeToAdd;
+    }
+
+    return nodeToAdd;
+}
+
 // TODO remove methods
 
 
