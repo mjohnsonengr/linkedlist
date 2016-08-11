@@ -280,7 +280,6 @@ const createSimpleNode = (i: number) => {
 };
 
 (function() {
-    let i = 0;
     const root = createSimpleNode(0),
         node1 = addLast(root, createSimpleNode(1)),
         node2 = addLast(root, createSimpleNode(2)),
@@ -318,14 +317,166 @@ const createSimpleNode = (i: number) => {
 
 // Scenario 2
 // ----------
-// a simple tree where all nodes who are siblings are the same time
+// a simple tree where all nodes who are siblings are the same type
 //  (all nodes with same depth are same type)
-// interface TypeA extends IRootNode<TypeB> { }
-// const createTypeA = () => createRoot<TypeB>();
+// as a bonus, we show making these ones out of classes
+interface IWalkable {
+    print(): void;
+    getNextNode(): IWalkable;
+    getNextSibling(): IWalkable;
+}
 
-// interface TypeB extends ITreeNode<TypeA, TypeC, TypeB> { }
-// const createTypeB = () => createNode<TypeA, TypeC, TypeB>();
+class TypeA implements IRootNode<TypeB>, IWalkable {
+    constructor(
+        public asdf: number,
+        public first: TypeB = null,
+        public last: TypeB = null
+    ) { }
 
-// interface TypeC extends ILeafNode<TypeB, TypeC> { }
-// const createTypeC = () => createLeaf<TypeB, TypeC>();
+    public print() {
+        // tslint:disable-next-line
+        console.log(this.asdf);
+    }
 
+    public getNextNode() {
+        return this.first;
+    }
+
+    public getNextSibling(): IWalkable {
+        return null;
+    }
+
+    public addFirst(node: TypeB) {
+        return addFirst(this as TypeA, node);
+    }
+
+    public addLast(node: TypeB) {
+        return addLast(this as TypeA, node);
+    }
+}
+
+class TypeB implements ITreeNode<TypeA, TypeC, TypeB>, IWalkable {
+    constructor(
+        public blargh: string,
+        public parent: TypeA = null,
+        public nextSibling: TypeB = null,
+        public prevSibling: TypeB = null,
+        public first: TypeC = null,
+        public last: TypeC = null
+    ) { }
+
+    public print() {
+        // tslint:disable-next-line
+        console.log(this.blargh);
+    }
+
+    public getNextNode(): IWalkable {
+        return this.first || this.getNextSibling();
+    }
+
+    public getNextSibling(): IWalkable {
+        return this.nextSibling || this.parent.getNextSibling();
+    }
+
+    public addFirst(node: TypeC) {
+        return addFirst(this as TypeB, node);
+    }
+
+    public addLast(node: TypeC) {
+        return addLast(this as TypeB, node);
+    }
+
+    public addNodeAfter(node: TypeB) {
+        return addAfter(this, node);
+    }
+
+    public addNodeBefore(node: TypeB) {
+        return addBefore(this, node);
+    }
+
+    public addAfter(node: TypeB) {
+        return addAfter(node, this);
+    }
+
+    public addBefore(node: TypeB) {
+        return addBefore(node, this);
+    }
+
+    public addToEndOf(parent: TypeA) {
+        return addLast(parent, this as TypeB);
+    }
+
+    public addToFrontOf(parent: TypeA) {
+        return addFirst(parent, this as TypeB);
+    }
+}
+
+class TypeC implements ILeafNode<TypeB, TypeC>, IWalkable {
+    constructor(
+        public qwer: number,
+        public parent: TypeB = null,
+        public nextSibling: TypeC = null,
+        public prevSibling: TypeC = null
+    ) { }
+
+    public print() {
+        // tslint:disable-next-line
+        console.log(this.qwer);
+    }
+
+    public getNextNode(): IWalkable {
+        return this.getNextSibling() || this.parent.getNextSibling();
+    }
+
+    public getNextSibling() {
+        return this.nextSibling;
+    }
+
+    public addNodeAfter(node: TypeC) {
+        return addAfter(this, node);
+    }
+
+    public addNodeBefore(node: TypeC) {
+        return addBefore(this, node);
+    }
+
+    public addAfter(node: TypeC) {
+        return addAfter(node, this);
+    }
+
+    public addBefore(node: TypeC) {
+        return addBefore(node, this);
+    }
+
+    public addToEndOf(parent: TypeB) {
+        return addLast(parent, this as TypeC);
+    }
+
+    public addToFrontOf(parent: TypeB) {
+        return addFirst(parent, this as TypeC);
+    }
+}
+
+(function() {
+    const root = new TypeA(0),
+        node1 = root.addFirst(new TypeB("Hello")),
+        node3 = node1.addNodeAfter(new TypeB("Colorado")),
+        node2 = new TypeB("World").addBefore(node3),
+        node11 = new TypeC(11).addToEndOf(node1),
+        node21 = node2.addLast(new TypeC(21)),
+        node33 = node3.addLast(new TypeC(33));
+    new TypeC(12).addAfter(node11).addNodeBefore(new TypeC(13));
+    node21.addNodeAfter(new TypeC(22)).addNodeAfter(new TypeC(23));
+    new TypeC(31).addBefore(new TypeC(32).addBefore(node33));
+
+    let node: IWalkable = root;
+    while (node != null) {
+        node.print();
+        node = node.getNextNode();
+    }
+}());
+
+// Scenario 3
+// ----------
+// a simple tree where in one level, siblings have a common type,
+// but are distinct.  Specifically test addAfter/addBefore in this case
