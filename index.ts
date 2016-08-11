@@ -64,20 +64,29 @@ function createNode<
     };
 }
 
-type IRootNode<TChild extends ITreeNodeChild<ITreeNodeParent<TChild>>> = ITreeNode<any, TChild, any>;
-function createRoot<TChild extends ITreeNodeChild<ITreeNodeParent<TChild>>>() {
-    return createNode<any, TChild, any>();
+type IRootNode<TChild extends ITreeNodeChild<ITreeNodeParent<TChild>>> = ITreeNodeParent<TChild>;
+function createRoot<
+    TChild extends ITreeNodeChild<ITreeNodeParent<TChild>>
+>(): IRootNode<TChild> {
+    return {
+        first: null,
+        last: null,
+    };
 }
 
 type ILeafNode<
     TParent extends ITreeNodeParent<ITreeNodeChild<TParent>>,
     TSibling extends ITreeNodeSibling<TSibling>
-> = ITreeNode<TParent, any, TSibling>;
+> = ITreeNodeChildSibling<TParent, TSibling>;
 function createLeaf<
     TParent extends ITreeNodeParent<ITreeNodeChild<TParent>>,
     TSibling extends ITreeNodeSibling<TSibling>
->() {
-    return createNode<TParent, any, TSibling>();
+>(): ILeafNode<TParent, TSibling> {
+    return {
+        parent: null,
+        nextSibling: null,
+        prevSibling: null,
+    };
 }
 
 // LinkedList helper function implementations
